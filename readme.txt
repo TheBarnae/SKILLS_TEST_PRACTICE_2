@@ -10,6 +10,9 @@ Setups:
  -XAMPP:
     -create necessary files on XAMPP server
         XAMPP -> htdocs -> make new folder/paste folder repo
+
+    -to access the XAMPP server dashboard type localhost/[foldername]
+
 VS Extensions to download:
     -PHP Intelephense
     -Prettier
