@@ -854,7 +854,7 @@ This file contains the PHP lessons and examples in learning order.
 ?>
 
 ```
-
+--------------------------------------------
 
 ### Querying Data
 
@@ -982,6 +982,7 @@ ALTER TABLE users DROP COLUMN age;
 DROP TABLE users;
 
 ```
+--------------------------------------------
 Safe sorting technique
 Use a whitelist for sortable columns:
 
