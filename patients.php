@@ -1,23 +1,23 @@
 
 <?php
-include "db_connector.php";
+require "db_connector.php";
 
 $message = "";
 $editData = null;
 
 // ADD PATIENT
 if (isset($_POST['add'])) {
-
-    $name = trim($_POST['patient_name']);
+    $fname = trim($_POST['patient_fname']);
+    $lname = trim($_POST['patient_lname']);
     $age = (int) $_POST['age'];
     $gender = $_POST['gender'];
     $contact = trim($_POST['contact']);
 
-    $sql = "INSERT INTO patients (patient_name, age, gender, contact)
-            VALUES (?, ?, ?, ?)";
+    $stmt = mysqli_prepare($conn,
+        "INSERT INTO patients (patient_fname, patient_lname, age, gender, contact)
+         VALUES (?, ?, ?, ?, ?)");
 
-    $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, "siss", $name, $age, $gender, $contact);
+    mysqli_stmt_bind_param($stmt, "ssiss", $fname, $lname, $age, $gender, $contact);
 
     if (mysqli_stmt_execute($stmt)) {
         header("Location: patients.php");
@@ -29,19 +29,19 @@ if (isset($_POST['add'])) {
 
 // UPDATE PATIENT
 if (isset($_POST['update'])) {
-
     $id = (int) $_POST['patient_id'];
-    $name = trim($_POST['patient_name']);
+    $fname = trim($_POST['patient_fname']);
+    $lname = trim($_POST['patient_lname']);
     $age = (int) $_POST['age'];
     $gender = $_POST['gender'];
     $contact = trim($_POST['contact']);
 
-    $sql = "UPDATE patients
-            SET patient_name=?, age=?, gender=?, contact=?
-            WHERE patient_id=?";
+    $stmt = mysqli_prepare($conn,
+        "UPDATE patients
+         SET patient_fname=?, patient_lname=?, age=?, gender=?, contact=?
+         WHERE patient_id=?");
 
-    $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, "sissi", $name, $age, $gender, $contact, $id);
+    mysqli_stmt_bind_param($stmt, "ssissi", $fname, $lname, $age, $gender, $contact, $id);
 
     if (mysqli_stmt_execute($stmt)) {
         header("Location: patients.php");
@@ -53,39 +53,66 @@ if (isset($_POST['update'])) {
 
 // DELETE PATIENT
 if (isset($_POST['delete'])) {
-
     $id = (int) $_POST['patient_id'];
 
-    $sql = "DELETE FROM patients WHERE patient_id=?";
+    $stmt = mysqli_prepare($conn,
+        "DELETE FROM patients WHERE patient_id=?");
 
-    $stmt = mysqli_prepare($conn, $sql);
     mysqli_stmt_bind_param($stmt, "i", $id);
 
     if (mysqli_stmt_execute($stmt)) {
         header("Location: patients.php");
         exit();
     } else {
-        $message = "Cannot delete patient. Existing consultations depend on this patient.";
+        $message = "Cannot delete this patient. They may have consultation records.";
     }
 }
 
 // GET PATIENT FOR EDITING
 if (isset($_GET['edit']) && ctype_digit($_GET['edit'])) {
-
     $id = (int) $_GET['edit'];
 
-    $sql = "SELECT * FROM patients WHERE patient_id=?";
+    $stmt = mysqli_prepare($conn,
+        "SELECT * FROM patients WHERE patient_id=?");
 
-    $stmt = mysqli_prepare($conn, $sql);
     mysqli_stmt_bind_param($stmt, "i", $id);
     mysqli_stmt_execute($stmt);
 
-    $resultEdit = mysqli_stmt_get_result($stmt);
-    $editData = mysqli_fetch_assoc($resultEdit);
+    $editData = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 }
 
-// DISPLAY PATIENTS
-$result = mysqli_query($conn, "SELECT * FROM patients ORDER BY patient_id DESC");
+// SEARCH
+$search = trim($_GET['search'] ?? '');
+
+// SORTING
+$allowedSort = [
+    "id" => "patient_id",
+    "name" => "patient_fname",
+    "age" => "age"
+];
+
+$sort = $_GET['sort'] ?? "id";
+$sortColumn = $allowedSort[$sort] ?? "patient_id";
+
+$direction = strtoupper($_GET['direction'] ?? "DESC");
+if (!in_array($direction, ["ASC", "DESC"])) {
+    $direction = "DESC";
+}
+
+// GET PATIENTS
+$sql = "SELECT * FROM patients
+        WHERE CAST(patient_id AS CHAR) LIKE ?
+        OR patient_fname LIKE ?
+        OR patient_lname LIKE ?
+        ORDER BY $sortColumn $direction";
+
+$stmt = mysqli_prepare($conn, $sql);
+
+$keyword = "%$search%";
+mysqli_stmt_bind_param($stmt, "sss", $keyword, $keyword, $keyword);
+mysqli_stmt_execute($stmt);
+
+$result = mysqli_stmt_get_result($stmt);
 ?>
 
 <!DOCTYPE html>
@@ -99,7 +126,6 @@ $result = mysqli_query($conn, "SELECT * FROM patients ORDER BY patient_id DESC")
 <div class="container">
 
     <h1>Patient Management</h1>
-
     <a href="index.php">Back to Dashboard</a>
 
     <h2><?php echo $editData ? "Edit Patient" : "Add Patient"; ?></h2>
@@ -113,30 +139,31 @@ $result = mysqli_query($conn, "SELECT * FROM patients ORDER BY patient_id DESC")
                    value="<?php echo $editData['patient_id']; ?>">
         <?php } ?>
 
-        <input type="text" name="patient_name"
-               placeholder="Patient Name"
-               value="<?php echo htmlspecialchars($editData['patient_name'] ?? ''); ?>"
+        <label>First Name:</label>
+        <input type="text" name="patient_fname"
+               value="<?php echo htmlspecialchars($editData['patient_fname'] ?? ''); ?>"
                required>
 
-        <input type="number" name="age"
-               placeholder="Age" min="1"
+        <label>Last Name:</label>
+        <input type="text" name="patient_lname"
+               value="<?php echo htmlspecialchars($editData['patient_lname'] ?? ''); ?>"
+               required>
+
+        <label>Age:</label>
+        <input type="number" name="age" min="0"
                value="<?php echo htmlspecialchars($editData['age'] ?? ''); ?>"
                required>
 
+        <label>Gender:</label>
         <select name="gender" required>
             <option value="">Select Gender</option>
-            <option value="Male"
-                <?php if (($editData['gender'] ?? '') == 'Male') echo 'selected'; ?>>
-                Male
-            </option>
-            <option value="Female"
-                <?php if (($editData['gender'] ?? '') == 'Female') echo 'selected'; ?>>
-                Female
-            </option>
+            <option value="Male" <?php if (($editData['gender'] ?? '') == "Male") echo "selected"; ?>>Male</option>
+            <option value="Female" <?php if (($editData['gender'] ?? '') == "Female") echo "selected"; ?>>Female</option>
+            <option value="Other" <?php if (($editData['gender'] ?? '') == "Other") echo "selected"; ?>>Other</option>
         </select>
 
+        <label>Contact:</label>
         <input type="text" name="contact"
-               placeholder="Contact Number"
                value="<?php echo htmlspecialchars($editData['contact'] ?? ''); ?>"
                required>
 
@@ -149,12 +176,34 @@ $result = mysqli_query($conn, "SELECT * FROM patients ORDER BY patient_id DESC")
 
     </form>
 
-    <h2>Patient List</h2>
+    <h2>Patient Records</h2>
+
+    <form method="GET" class="search-sort-form">
+
+        <input type="text" name="search"
+               placeholder="Search patient ID or name"
+               value="<?php echo htmlspecialchars($search); ?>">
+
+        <select name="sort">
+            <option value="id" <?php if ($sort == "id") echo "selected"; ?>>Sort by ID</option>
+            <option value="name" <?php if ($sort == "name") echo "selected"; ?>>Sort by Name</option>
+            <option value="age" <?php if ($sort == "age") echo "selected"; ?>>Sort by Age</option>
+        </select>
+
+        <select name="direction">
+            <option value="ASC" <?php if ($direction == "ASC") echo "selected"; ?>>Ascending</option>
+            <option value="DESC" <?php if ($direction == "DESC") echo "selected"; ?>>Descending</option>
+        </select>
+
+        <button type="submit">Search / Sort</button>
+        <a href="patients.php">Reset</a>
+
+    </form>
 
     <table>
         <tr>
             <th>ID</th>
-            <th>Name</th>
+            <th>Patient Name</th>
             <th>Age</th>
             <th>Gender</th>
             <th>Contact</th>
@@ -162,33 +211,27 @@ $result = mysqli_query($conn, "SELECT * FROM patients ORDER BY patient_id DESC")
         </tr>
 
         <?php while ($row = mysqli_fetch_assoc($result)) { ?>
-
         <tr>
             <td><?php echo $row['patient_id']; ?></td>
-            <td><?php echo htmlspecialchars($row['patient_name']); ?></td>
+            <td><?php echo htmlspecialchars($row['patient_fname'] . ' ' . $row['patient_lname']); ?></td>
             <td><?php echo $row['age']; ?></td>
             <td><?php echo htmlspecialchars($row['gender']); ?></td>
             <td><?php echo htmlspecialchars($row['contact']); ?></td>
-
             <td>
                 <a href="patients.php?edit=<?php echo $row['patient_id']; ?>">Edit</a>
 
                 <form method="POST" class="inline-form"
                       onsubmit="return confirm('Delete this patient?');">
-
                     <input type="hidden" name="patient_id"
                            value="<?php echo $row['patient_id']; ?>">
-
                     <button type="submit" name="delete">Delete</button>
                 </form>
             </td>
         </tr>
-
         <?php } ?>
 
     </table>
 
 </div>
-
 </body>
 </html>
