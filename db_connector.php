@@ -1,17 +1,13 @@
-<?php
-    // Database connection parameters
-    $db_host = "localhost";
-    $db_user = "root";
-    $db_pass = "";
-    $db_name = "consultation_system";
-    $conn = "";
 
-    $conn = mysqli_connect(
-                        $db_host, 
-                        $db_user, 
-                        $db_pass, 
-                        $db_name);
-   if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
-    }
+<?php
+$host = "localhost";
+$user = "root";
+$password = "";
+$database = "consultation_system";
+
+$conn = mysqli_connect($host, $user, $password, $database);
+
+if (!$conn) {
+    die("Database connection failed: " . mysqli_connect_error());
+}
 ?>

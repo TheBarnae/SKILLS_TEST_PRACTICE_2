@@ -1,6 +1,6 @@
 
 <?php
-include "db.php";
+require "db_connector.php";
 
 $message = "";
 $editData = null;

@@ -854,3 +854,131 @@ This file contains the PHP lessons and examples in learning order.
 ?>
 
 ```
+
+
+### Querying Data
+
+```sql
+-- Select specific columns
+SELECT first_name, last_name, email FROM employees;
+
+-- Select all columns
+SELECT * FROM employees;
+
+-- Return unique values only
+SELECT DISTINCT department FROM employees;
+
+-- Limit row count and skip offset
+SELECT * FROM employees LIMIT 10 OFFSET 20;
+
+-- Sort results (ASC is default, DESC for descending)
+SELECT * FROM employees ORDER BY salary DESC, last_name ASC;
+
+```
+
+---
+
+### Filtering Results (`WHERE`)
+
+| Operator | Description | Example |
+| --- | --- | --- |
+| `=` | Equal to | `WHERE status = 'active'` |
+| `<>` or `!=` | Not equal to | `WHERE status != 'terminated'` |
+| `>`, `<`, `>=`, `<=` | Comparison | `WHERE salary >= 60000` |
+| `BETWEEN` | Inclusive range | `WHERE age BETWEEN 25 AND 40` |
+| `IN (...)` | Matches any item in list | `WHERE state IN ('CA', 'NY', 'TX')` |
+| `LIKE` | Pattern matching (`%` = multi-char, `_` = single-char) | `WHERE email LIKE '%@gmail.com'` |
+| `IS NULL` / `IS NOT NULL` | Test for NULL values | `WHERE manager_id IS NULL` |
+| `AND` / `OR` / `NOT` | Combine conditions | `WHERE active = 1 AND (role = 'admin' OR role = 'lead')` |
+
+---
+
+### Joining Tables
+
+```sql
+-- INNER JOIN: Returns rows with matching values in both tables
+SELECT orders.id, customers.company_name
+FROM orders
+INNER JOIN customers ON orders.customer_id = customers.id;
+
+-- LEFT JOIN: Returns all rows from left table, and matched rows from right
+SELECT customers.company_name, orders.id
+FROM customers
+LEFT JOIN orders ON customers.id = orders.customer_id;
+
+-- RIGHT JOIN: Returns all rows from right table, and matched rows from left
+SELECT orders.id, employees.first_name
+FROM orders
+RIGHT JOIN employees ON orders.employee_id = employees.id;
+
+-- FULL OUTER JOIN: Returns all records when there is a match in either table
+SELECT * FROM table_a
+FULL OUTER JOIN table_b ON table_a.id = table_b.id;
+
+```
+
+---
+
+### Aggregation & Grouping
+
+| Function | Description | Example |
+| --- | --- | --- |
+| `COUNT()` | Count rows or non-null values | `SELECT COUNT(*) FROM orders;` |
+| `SUM()` | Sum numeric column values | `SELECT SUM(total_amount) FROM sales;` |
+| `AVG()` | Average numeric column values | `SELECT AVG(price) FROM products;` |
+| `MIN()` / `MAX()` | Smallest or largest value | `SELECT MIN(created_at), MAX(created_at) FROM logs;` |
+
+```sql
+-- Group records and filter grouped results
+-- Note: WHERE filters raw rows before grouping; HAVING filters aggregated groups
+SELECT department, COUNT(*) AS total_staff, AVG(salary) AS avg_pay
+FROM employees
+WHERE status = 'active'
+GROUP BY department
+HAVING AVG(salary) > 50000
+ORDER BY avg_pay DESC;
+
+```
+
+---
+
+### Data Modification (DML)
+
+```sql
+-- Insert new records
+INSERT INTO users (username, email, status)
+VALUES ('jdoe', 'jdoe@example.com', 'active');
+
+-- Update existing records (Always specify WHERE to avoid updating all rows)
+UPDATE users
+SET email = 'john.doe@example.com', status = 'verified'
+WHERE id = 42;
+
+-- Delete records (Always specify WHERE to avoid wiping the table)
+DELETE FROM users
+WHERE status = 'inactive' AND last_login < '2024-01-01';
+
+```
+
+---
+
+### Schema Management (DDL)
+
+```sql
+-- Create a table with constraints
+CREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL,
+    age INT CHECK (age >= 18),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Modify table structure
+ALTER TABLE users ADD COLUMN phone_number VARCHAR(20);
+ALTER TABLE users DROP COLUMN age;
+
+-- Permanently remove table and all data
+DROP TABLE users;
+
+```
