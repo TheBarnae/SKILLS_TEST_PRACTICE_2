@@ -16,7 +16,7 @@ Setups:
 VS Extensions to download:
     -PHP Intelephense
     -Prettier
-    -Live Server
+    -Live Server (also install the web extension)
     -PHP Server
     -Error Lens
     -ESLint
