@@ -1,0 +1,34 @@
+
+CREATE DATABASE consultation_system;
+
+USE consultation_system;
+
+CREATE TABLE doctors (
+    doctor_id INT AUTO_INCREMENT PRIMARY KEY,
+    doctor_name VARCHAR(100) NOT NULL,
+    specialization VARCHAR(100) NOT NULL,
+    contact VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE patients (
+    patient_id INT AUTO_INCREMENT PRIMARY KEY,
+    patient_name VARCHAR(100) NOT NULL,
+    age INT NOT NULL,
+    gender VARCHAR(20) NOT NULL,
+    contact VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE consultations (
+    consultation_id INT AUTO_INCREMENT PRIMARY KEY,
+    doctor_id INT NOT NULL,
+    patient_id INT NOT NULL,
+    consultation_date DATE NOT NULL,
+    diagnosis TEXT NOT NULL,
+    treatment TEXT NOT NULL,
+
+    FOREIGN KEY (doctor_id)
+        REFERENCES doctors(doctor_id),
+
+    FOREIGN KEY (patient_id)
+        REFERENCES patients(patient_id)
+);
