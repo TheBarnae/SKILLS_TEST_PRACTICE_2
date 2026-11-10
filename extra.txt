@@ -982,3 +982,64 @@ ALTER TABLE users DROP COLUMN age;
 DROP TABLE users;
 
 ```
+Safe sorting technique
+Use a whitelist for sortable columns:
+
+<?php
+$allowedSort = [
+    "id" => "patient_id",
+    "name" => "patient_fname",
+    "age" => "age"
+];
+
+$sort = $_GET['sort'] ?? 'id';
+$sortColumn = $allowedSort[$sort] ?? 'patient_id';
+
+$direction = strtoupper($_GET['direction'] ?? 'DESC');
+
+if (!in_array($direction, ['ASC', 'DESC'], true)) {
+    $direction = 'DESC';
+}
+
+Then safely place the validated values in the query:
+
+<?php
+$sql = "SELECT * FROM patients
+        ORDER BY $sortColumn $direction";
+
+$result = mysqli_query($conn, $sql);
+
+HTML controls:
+<?php
+<select name="sort">
+    <option value="id">Sort by ID</option>
+    <option value="name">Sort by Name</option>
+    <option value="age">Sort by Age</option>
+</select>
+
+<select name="direction">
+    <option value="ASC">Ascending</option>
+    <option value="DESC">Descending</option>
+</select>
+
+<button type="submit">Sort</button>
+
+The important rule is: never directly use $_GET['sort'] or $_GET['direction'] inside SQL. The whitelist converts user input into known-safe column names and directions.
+
+For most exam CRUD systems, memorize this pattern:
+<?php
+$allowedSort = [
+    "id" => "id",
+    "name" => "name",
+    "date" => "created_at"
+];
+
+$sort = $_GET['sort'] ?? 'id';
+$column = $allowedSort[$sort] ?? 'id';
+
+$direction = strtoupper($_GET['direction'] ?? 'ASC');
+$direction = in_array($direction, ['ASC', 'DESC'], true)
+    ? $direction
+    : 'ASC';
+
+$sql = "SELECT * FROM your_table ORDER BY $column $direction";
