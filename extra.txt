@@ -1,0 +1,856 @@
+﻿# PHP Study Notes
+
+This file contains the PHP lessons and examples in learning order.
+
+## Contents
+
+### Core PHP
+
+1. [Introduction & Server Setup](#lesson-1-introduction--server-setup)
+2. [Variables & Data Types](#lesson-2-variables--data-types)
+3. [Arithmetic Operators](#lesson-3-arithmetic-operators)
+
+### Conditions and Control Flow
+
+4. [GET and POST Superglobals](#lesson-4-get-and-post-superglobals)
+5. [Math Functions](#lesson-5-math-functions)
+6. [If Statements & Logic](#lesson-6-if-statements--logic)
+7. [Logical Operators](#lesson-7-logical-operators)
+8. [Switch Statements](#lesson-8-switch-statements)
+9. [For Loops](#lesson-9-for-loops)
+10. [While Loops](#lesson-10-while-loops)
+
+### Data and Reusable Code
+
+11. [Arrays](#lesson-11-arrays)
+12. [Associative Arrays](#lesson-12-associative-arrays)
+13. [isset() & empty()](#lesson-13-isset--empty)
+14. [Radio Buttons](#lesson-14-radio-buttons)
+15. [Checkboxes](#lesson-15-checkboxes)
+16. [Functions](#lesson-16-functions)
+17. [String Functions](#lesson-17-string-functions)
+
+### Forms, Sessions, and Security
+
+18. [Sanitizing & Validating Input](#lesson-18-sanitizing--validating-input)
+19. [Include Function](#lesson-19-include-function)
+20. [Cookies](#lesson-20-cookies)
+21. [Sessions](#lesson-21-sessions)
+22. [$_SERVER Superglobal](#lesson-22-_server-superglobal)
+23. [Password Hashing](#lesson-23-password-hashing)
+
+### MySQL and Projects
+
+24. [Connecting to MySQL Database](#lesson-24-connecting-to-mysql-database)
+25. [Creating a Table in phpMyAdmin](#lesson-25-creating-a-table-in-phpmyadmin)
+26. [Inserting Data into MySQL](#lesson-26-inserting-data-into-mysql)
+27. [Querying Data from MySQL](#lesson-27-querying-data-from-mysql)
+28. [Registration Form Project](#lesson-28-registration-form-project)
+
+---
+
+## Core PHP
+
+### Lesson 1: Introduction & Server Setup
+
+* **Server-Side Processing:** PHP executes on an Apache server and generates standard HTML before returning it to the user's browser.
+* **Environment:** Developed using XAMPP (Apache + MySQL bundle) and Visual Studio Code. Server files are located in `C:\xampp\htdocs\website\`.
+* **Basic Syntax:** PHP scripts begin with `<?php` and end with `?>`. Every statement ends with a semicolon `;`.
+* **Output & Comments:** `echo` outputs HTML/text. Single-line comments use `//`, multi-line comments use `/* ... */`.
+
+```php
+<?php
+    echo "I like pizza <br>";
+    echo "It's really good <br>";
+
+    // This is a single-line comment
+
+    /*
+       This is a multi-line comment
+       spanning multiple lines
+    */
+?>
+
+```
+
+---
+
+### Lesson 2: Variables & Data Types
+
+* **Variables:** Prefixed with `$`. No explicit type declaration required (weakly typed).
+* **Data Types:** Strings (`"text"`), Integers (`21`), Floats (`4.99`), Booleans (`true`/`false`).
+* **String Interpolation:** Variables inside double quotes `"Hello {$name}"` automatically expand. Escaping `$` requires a backslash `\$`.
+
+```php
+<?php
+    $name = "Bro Code";
+    $food = "Pizza";
+    $email = "fake123@gmail.com";
+    $age = 21;
+    $gpa = 2.5;
+    $price = 4.99;
+    $online = true;
+    $quantity = 3;
+
+    echo "Hello {$name}<br>";
+    echo "You like {$food}<br>";
+    echo "Your email is {$email}<br>";
+    echo "You are {$age} years old<br>";
+    echo "Your GPA is {$gpa}<br>";
+    echo "Your pizza is \${$price}<br>";
+    echo "Online status: {$online}<br>"; // Prints 1 for true, nothing for false
+
+    $total = $quantity * $price;
+    echo "You ordered {$quantity} x {$food}s<br>";
+    echo "Your total is: \${$total}<br>";
+?>
+
+```
+
+---
+
+### Lesson 3: Arithmetic Operators
+
+* **Operators:** Addition (`+`), Subtraction (`-`), Multiplication (`*`), Division (`/`), Exponentiation (`**`), Modulus (`%` for remainders).
+* **Increment/Decrement:** `$counter++`, `$counter--`, `$counter += 2`, `$counter -= 2`.
+* **Precedence:** Parentheses $\rightarrow$ Exponents $\rightarrow$ Multiplication/Division/Modulus $\rightarrow$ Addition/Subtraction.
+
+```php
+<?php
+    $x = 10;
+    $y = 3;
+
+    $addition = $x + $y;       // 13
+    $subtraction = $x - $y;    // 7
+    $multiplication = $x * $y; // 30
+    $division = $x / $y;       // 3.3333
+    $exponent = $x ** $y;      // 1000
+    $modulus = $x % $y;        // 1
+
+    $counter = 0;
+    $counter++;                // 1
+    $counter += 5;             // 6
+
+    // Precedence: (1 + 2) - 3 * 4 / 5 ** 2
+    $total = 1 + 2 - 3 * 4 / 5 ** 2;
+    echo "Total: {$total}";
+?>
+
+```
+
+---
+
+## Conditions and Control Flow
+
+### Lesson 4: GET and POST Superglobals
+
+* **`$_GET`:** Data appended directly to the URL (`?user=bro`). Insecure for passwords, but supports bookmarking and caching (best for search pages).
+* **`$_POST`:** Data sent inside HTTP request body. Secure for credentials, has no size limit, and cannot be bookmarked.
+
+```html
+<!-- index.php -->
+<form action="index.php" method="post">
+    <label>Username:</label><br>
+    <input type="text" name="username"><br>
+    <label>Password:</label><br>
+    <input type="password" name="password"><br>
+    <input type="submit" value="Log in">
+</form>
+
+```
+
+```php
+<?php
+    if (isset($_POST["username"])) {
+        echo "Username: {$_POST['username']}<br>";
+        echo "Password: {$_POST['password']}<br>";
+    }
+?>
+
+```
+
+---
+
+### Lesson 5: Math Functions
+
+* **Built-in Functions:** Common mathematical helper methods in PHP.
+
+```php
+<?php
+    $x = -5;
+    $y = 3.14;
+    $z = 4;
+
+    $val1 = abs($x);          // 5 (absolute value)
+    $val2 = round($y);        // 3 (nearest integer)
+    $val3 = floor($y);        // 3 (always rounds down)
+    $val4 = ceil($y);         // 4 (always rounds up)
+    $val5 = pow($x, $z);      // 625 (power)
+    $val6 = sqrt($z);         // 2 (square root)
+    $val7 = max($x, $y, $z);  // 4 (highest value)
+    $val8 = min($x, $y, $z);  // -5 (lowest value)
+    $val9 = pi();             // 3.14159...
+    $val10 = rand(1, 6);      // Random integer between 1 and 6
+
+    echo "Random dice roll: {$val10}";
+?>
+
+```
+
+---
+
+### Lesson 6: If Statements & Logic
+
+* **Conditionals:** Evaluate truth conditions (`if`, `else if`, `else`).
+* **Comparison Operators:** `==` (equal), `===` (identical value and type), `!=`, `<`, `>`, `<=`, `>=`.
+
+```php
+<?php
+    $age = 21;
+
+    if ($age >= 100) {
+        echo "You are too old to enter this site.";
+    } elseif ($age >= 18) {
+        echo "You may enter this site.";
+    } elseif ($age <= 0) {
+        echo "That was not a valid age.";
+    } else {
+        echo "You must be 18+ to enter.";
+    }
+
+    // Overtime Pay Calculation Example
+    $hours = 45;
+    $rate = 15;
+    $pay = null;
+
+    if ($hours <= 0) {
+        $pay = 0;
+    } elseif ($hours <= 40) {
+        $pay = $hours * $rate;
+    } else {
+        $pay = (40 * $rate) + (($hours - 40) * ($rate * 1.5));
+    }
+
+    echo "<br>Weekly Pay: \${$pay}";
+?>
+
+```
+
+---
+
+### Lesson 7: Logical Operators
+
+* **Logical Operators:** Combine conditions using `&&` (AND), `||` (OR), and `!` (NOT).
+
+```php
+<?php
+    $temp = 25;
+    $cloudy = false;
+
+    // AND (&&): Both conditions must be true
+    if ($temp >= 0 && $temp <= 30) {
+        echo "The weather is good.<br>";
+    } else {
+        echo "The weather is bad.<br>";
+    }
+
+    // OR (||): At least one condition must be true
+    if ($temp < 0 || $temp > 30) {
+        echo "Extreme temperature alert!<br>";
+    }
+
+    // NOT (!): Reverses boolean value
+    if (!$cloudy) {
+        echo "It is sunny outside.<br>";
+    }
+?>
+
+```
+
+---
+
+### Lesson 8: Switch Statements
+
+* **Switch:** Replaces long `else if` chains when checking one variable against discrete values.
+* **Structure:** Requires `case value:`, `break;` (to exit switch), and `default:` (fallback).
+
+```php
+<?php
+    $grade = "A";
+
+    switch ($grade) {
+        case "A":
+            echo "You did great!";
+            break;
+        case "B":
+            echo "You did good!";
+            break;
+        case "C":
+            echo "You did okay!";
+            break;
+        case "D":
+            echo "You did poorly!";
+            break;
+        case "F":
+            echo "You failed!";
+            break;
+        default:
+            echo "{$grade} is not a valid letter grade.";
+    }
+?>
+
+```
+
+---
+
+## Data and Reusable Code
+
+### Lesson 9: For Loops
+
+* **For Loop:** Executes code a predefined number of times. Contains `$counter`, `$condition`, and `$step`.
+
+```php
+<?php
+    // Count up from 1 to 10
+    for ($i = 1; $i <= 10; $i++) {
+        echo $i . "<br>";
+    }
+
+    // Count down from 10 to 1
+    for ($i = 10; $i > 0; $i--) {
+        echo $i . "<br>";
+    }
+?>
+
+```
+
+---
+
+### Lesson 10: While Loops
+
+* **While Loop:** Runs continuously while its condition remains `true`. State must be modified inside the loop to avoid infinite execution.
+
+```php
+<?php
+    $counter = 0;
+
+    while ($counter < 10) {
+        $counter++;
+        echo "Counter: {$counter}<br>";
+    }
+?>
+
+```
+
+---
+
+### Lesson 11: Arrays
+
+* **Indexed Array:** Holds multiple values in a single variable. Zero-indexed (`$foods[0]`).
+* **Functions:** `array_push()`, `array_pop()`, `array_shift()`, `array_reverse()`, `count()`.
+
+```php
+<?php
+    $foods = array("apple", "orange", "banana", "coconut");
+
+    $foods[0] = "pineapple";    // Modify index 0
+    array_push($foods, "kiwi"); // Add item to end
+    array_pop($foods);          // Remove last item
+    array_shift($foods);        // Remove first item
+
+    // Loop through array
+    foreach ($foods as $food) {
+        echo $food . "<br>";
+    }
+
+    echo "Total items: " . count($foods);
+?>
+
+```
+
+---
+
+### Lesson 12: Associative Arrays
+
+* **Key-Value Pairs:** Array elements mapped as `"key" => "value"`.
+* **Functions:** `array_keys()`, `array_values()`, `array_flip()`, `array_reverse()`.
+
+```php
+<?php
+    $capitals = array(
+        "USA" => "Washington D.C.",
+        "Japan" => "Tokyo",
+        "South Korea" => "Seoul",
+        "India" => "New Delhi"
+    );
+
+    $capitals["USA"] = "Las Vegas"; // Update existing key
+    $capitals["China"] = "Beijing";   // Add new key-value pair
+
+    foreach ($capitals as $country => $capital) {
+        echo "The capital of {$country} is {$capital}<br>";
+    }
+?>
+
+```
+
+---
+
+### Lesson 13: isset() & empty()
+
+* **`isset($var)`:** Returns `true` if variable is declared and not `null`.
+* **`empty($var)`:** Returns `true` if variable is undeclared, `false`, `null`, `0`, or an empty string `""`.
+
+```php
+<?php
+    $username = "BroCode";
+
+    if (isset($username)) {
+        echo "Variable is set.<br>";
+    } else {
+        echo "Variable is NOT set.<br>";
+    }
+
+    if (empty($username)) {
+        echo "Variable is empty.<br>";
+    } else {
+        echo "Variable is NOT empty.<br>";
+    }
+?>
+
+```
+
+---
+
+### Lesson 14: Radio Buttons
+
+* **Grouping:** Radio inputs share a single `name` attribute so only one choice can be selected.
+
+```html
+<form action="index.php" method="post">
+    <input type="radio" name="credit_card" value="Visa"> Visa<br>
+    <input type="radio" name="credit_card" value="MasterCard"> MasterCard<br>
+    <input type="radio" name="credit_card" value="American Express"> American Express<br>
+    <input type="submit" name="confirm" value="Confirm">
+</form>
+
+```
+
+```php
+<?php
+    if (isset($_POST["confirm"])) {
+        if (isset($_POST["credit_card"])) {
+            $credit_card = $_POST["credit_card"];
+            echo "You selected: {$credit_card}";
+        } else {
+            echo "Please make a selection!";
+        }
+    }
+?>
+
+```
+
+---
+
+### Lesson 15: Checkboxes
+
+* **Multiple Selection:** Appending `[]` to the input name (`foods[]`) packs selected items into a PHP array.
+
+```html
+<form action="index.php" method="post">
+    <input type="checkbox" name="foods[]" value="Pizza"> Pizza<br>
+    <input type="checkbox" name="foods[]" value="Hamburger"> Hamburger<br>
+    <input type="checkbox" name="foods[]" value="Tacos"> Tacos<br>
+    <input type="submit" name="submit" value="Submit">
+</form>
+
+```
+
+```php
+<?php
+    if (isset($_POST["submit"])) {
+        if (!empty($_POST["foods"])) {
+            $foods = $_POST["foods"];
+            foreach ($foods as $food) {
+                echo "You selected: {$food}<br>";
+            }
+        } else {
+            echo "Please select at least one food.";
+        }
+    }
+?>
+
+```
+
+---
+
+### Lesson 16: Functions
+
+* **User Functions:** Reusable blocks declared with `function name($params)`. Return values via `return`.
+
+```php
+<?php
+    function happy_birthday($name, $age) {
+        echo "Happy Birthday dear {$name}!<br>";
+        echo "You are {$age} years old!<br><br>";
+    }
+
+    happy_birthday("SpongeBob", 30);
+
+    // Function with return type hint
+    function hypotenuse(float $a, float $b): float {
+        return sqrt(pow($a, 2) + pow($b, 2));
+    }
+
+    echo "Hypotenuse: " . hypotenuse(3.0, 4.0);
+?>
+
+```
+
+---
+
+### Lesson 17: String Functions
+
+* **Manipulating Strings:** Built-in string utility methods.
+
+```php
+<?php
+    $username = "Bro Code";
+    $phone = "123-456-7890";
+
+    $username = strtolower($username);               // bro code
+    $username = strtoupper($username);               // BRO CODE
+    $username = trim($username);                     // strip leading/trailing whitespace
+    $padded = str_pad($username, 20, "0");           // Pad string length to 20
+    $clean_phone = str_replace("-", "", $phone);     // Replace dashes
+    $reversed = strrev($username);                   // Reverse text
+    $shuffled = str_shuffle($username);              // Shuffle characters
+    $length = strlen($phone);                        // Character count
+    $index = strpos($phone, "-");                    // Position of first match
+    $first_three = substr($phone, 0, 3);             // Substring slice
+
+    // Explode (string to array) & Implode (array to string)
+    $array = explode("-", $phone);                   // ["123", "456", "7890"]
+    $string = implode("/", $array);                  // "123/456/7890"
+?>
+
+```
+
+---
+
+## Forms, Sessions, and Security
+
+### Lesson 18: Sanitizing & Validating Input
+
+* **Sanitization:** Removes dangerous code/characters using `filter_input()`.
+* **Validation:** Rejects input (returns `false`/empty string) if data type/format criteria fail.
+
+```php
+<?php
+    if (isset($_POST["login"])) {
+        // Sanitization Filters
+        $username = filter_input(INPUT_POST, "username", FILTER_SANITIZE_SPECIAL_CHARS);
+        $age = filter_input(INPUT_POST, "age", FILTER_SANITIZE_NUMBER_INT);
+        $email = filter_input(INPUT_POST, "email", FILTER_SANITIZE_EMAIL);
+
+        // Validation Filters
+        $valid_age = filter_input(INPUT_POST, "age", FILTER_VALIDATE_INT);
+        $valid_email = filter_input(INPUT_POST, "email", FILTER_VALIDATE_EMAIL);
+
+        if (empty($valid_email)) {
+            echo "That email was not valid!";
+        } else {
+            echo "Valid email: {$valid_email}";
+        }
+    }
+?>
+
+```
+
+---
+
+### Lesson 19: Include Function
+
+* **Reusability:** `include("filename")` inserts HTML/PHP code from external files into current script.
+
+```php
+<!-- index.php -->
+<?php
+    include("header.html");
+?>
+<main>
+    <h1>Home Page</h1>
+    <p>Welcome to the site content!</p>
+</main>
+<?php
+    include("footer.html");
+?>
+
+```
+
+---
+
+### Lesson 20: Cookies
+
+* **Cookies:** Small key-value data stored in browser via `setcookie($name, $value, $expire, $path)`.
+
+```php
+<?php
+    // Set cookie for 2 days (86400 seconds * 2)
+    setcookie("fav_food", "pizza", time() + (86400 * 2), "/");
+
+    // Read cookie
+    if (isset($_COOKIE["fav_food"])) {
+        echo "Favorite food: " . $_COOKIE["fav_food"];
+    } else {
+        echo "Cookie is not set.";
+    }
+
+    // Delete cookie by setting expiration in the past
+    // setcookie("fav_food", "", time() - 3600, "/");
+?>
+
+```
+
+---
+
+### Lesson 21: Sessions
+
+* **Sessions:** Secure server-side state stored across multiple pages. `session_start()` must precede any HTML output.
+
+```php
+<!-- login.php -->
+<?php
+    session_start();
+
+    if (isset($_POST["login"])) {
+        if (!empty($_POST["username"])) {
+            $_SESSION["username"] = $_POST["username"];
+            header("Location: home.php"); // Redirect
+        }
+    }
+?>
+
+```
+
+```php
+<!-- home.php -->
+<?php
+    session_start();
+    echo "Welcome back, " . $_SESSION["username"] . "<br>";
+
+    // Logout
+    if (isset($_POST["logout"])) {
+        session_destroy();
+        header("Location: login.php");
+    }
+?>
+
+```
+
+---
+
+### Lesson 22: $_SERVER Superglobal
+
+* **Server Metadata:** Array containing HTTP headers, server paths, and script details.
+* **Security:** Use `htmlspecialchars($_SERVER["PHP_SELF"])` on self-submitting forms to prevent XSS attacks.
+
+```html
+<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+    <input type="text" name="username">
+    <input type="submit" value="Submit">
+</form>
+
+```
+
+```php
+<?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        echo "Form was submitted via POST.";
+    }
+?>
+
+```
+
+---
+
+### Lesson 23: Password Hashing
+
+* **Hashing:** One-way mathematical transformation of text to hide plain text credentials.
+* **Functions:** `password_hash()` (uses bcrypt by default) and `password_verify()`.
+
+```php
+<?php
+    $password = "pizza123";
+
+    // Hash password
+    $hash = password_hash($password, PASSWORD_DEFAULT);
+    echo "Hashed password: {$hash}<br>";
+
+    // Verify password against stored hash
+    if (password_verify("pizza123", $hash)) {
+        echo "Password verified! User logged in.";
+    } else {
+        echo "Incorrect password!";
+    }
+?>
+
+```
+
+---
+
+## MySQL and Projects
+
+### Lesson 24: Connecting to MySQL Database
+
+* **MySQL Extension:** `mysqli_connect()` establishes connection. Wrap in `try/catch` to handle connection errors gracefully.
+
+```php
+<?php
+    // database.php
+    $db_server = "localhost";
+    $db_user = "root";
+    $db_pass = "";
+    $db_name = "businessdb";
+    $conn = "";
+
+    try {
+        $conn = mysqli_connect($db_server, $db_user, $db_pass, $db_name);
+    } catch (mysqli_sql_exception $e) {
+        echo "Could not connect to database!<br>";
+    }
+
+    if ($conn) {
+        echo "Successfully connected!<br>";
+    }
+?>
+
+```
+
+---
+
+### Lesson 25: Creating a Table in phpMyAdmin
+
+* **Database Setup:** Managed via phpMyAdmin (`http://localhost/phpmyadmin`).
+* **Table Schema:** `users`
+* `id`: `INT`, Primary Key, Auto-Increment (`A_I`)
+* `user`: `VARCHAR(25)`, Unique
+* `password`: `VARCHAR(255)` (stores hash)
+* `reg_date`: `DATETIME`, Default `CURRENT_TIMESTAMP`
+
+
+
+---
+
+### Lesson 26: Inserting Data into MySQL
+
+* **Insertion:** Build query string $\rightarrow$ Execute via `mysqli_query()` $\rightarrow$ Close connection with `mysqli_close()`.
+
+```php
+<?php
+    include("database.php");
+
+    $username = "Patrick";
+    $password = "rock3";
+    $hash = password_hash($password, PASSWORD_DEFAULT);
+
+    $sql = "INSERT INTO users (user, password) 
+            VALUES ('$username', '$hash')";
+
+    try {
+        mysqli_query($conn, $sql);
+        echo "User registered successfully!";
+    } catch (mysqli_sql_exception $e) {
+        echo "Could not register user!";
+    }
+
+    mysqli_close($conn);
+?>
+
+```
+
+---
+
+### Lesson 27: Querying Data from MySQL
+
+* **Fetching Rows:** `mysqli_query()` returns result object. Retrieve rows with `mysqli_fetch_assoc()` in a `while` loop.
+
+```php
+<?php
+    include("database.php");
+
+    $sql = "SELECT * FROM users";
+    $result = mysqli_query($conn, $sql);
+
+    if (mysqli_num_rows($result) > 0) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            echo "ID: " . $row["id"] . "<br>";
+            echo "User: " . $row["user"] . "<br>";
+            echo "Registered: " . $row["reg_date"] . "<br><br>";
+        }
+    } else {
+        echo "No users found.";
+    }
+
+    mysqli_close($conn);
+?>
+
+```
+
+---
+
+### Lesson 28: Registration Form Project
+
+* **Complete App:** Combines HTML form, POST handling, input sanitization, password hashing, SQL insert query, and exception handling for duplicate usernames.
+
+```html
+<!-- index.php -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration Page</title>
+</head>
+<body>
+    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+        <h2>Welcome to Fakebook</h2>
+        <label>Username:</label><br>
+        <input type="text" name="username"><br>
+        <label>Password:</label><br>
+        <input type="password" name="password"><br><br>
+        <input type="submit" name="submit" value="Register">
+    </form>
+</body>
+</html>
+
+```
+
+```php
+<?php
+    include("database.php");
+
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        $username = filter_input(INPUT_POST, "username", FILTER_SANITIZE_SPECIAL_CHARS);
+        $password = filter_input(INPUT_POST, "password", FILTER_SANITIZE_SPECIAL_CHARS);
+
+        if (empty($username)) {
+            echo "Please enter a username.";
+        } elseif (empty($password)) {
+            echo "Please enter a password.";
+        } else {
+            $hash = password_hash($password, PASSWORD_DEFAULT);
+            $sql = "INSERT INTO users (user, password) VALUES ('$username', '$hash')";
+
+            try {
+                mysqli_query($conn, $sql);
+                echo "You are now registered!";
+            } catch (mysqli_sql_exception $e) {
+                echo "That username is already taken.";
+            }
+        }
+    }
+
+    mysqli_close($conn);
+?>
+
+```
